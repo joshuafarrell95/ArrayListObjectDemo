@@ -27,16 +27,17 @@ public class ArrayListObjectDemo {
     public static void main(String[] args) {
         //ArrayList<Car> cars = new ArrayList<>();
         String fileName;
-
+        
         if (checkFile(args)) {
             fileName = args[1];
         } else {
-            fileName = "results.bin";
+            fileName = "result.bin";
         }
-
-        ArrayList<Car> cars = loadFile(fileName);
-
-        acceptInput(cars);
+        
+        ArrayList<Car> cars = new ArrayList<>();
+        deserialize(cars, fileName);
+        
+        acceptInput(cars, fileName); /* run driver code */
     }
 
     public static boolean checkFile(String[] args) {
@@ -48,15 +49,7 @@ public class ArrayListObjectDemo {
         return true;
     }
 
-    public static ArrayList<Car> loadFile(String fileName) {
-        ArrayList<Car> loadCars = new ArrayList<>();
-
-        deserialize(loadCars, fileName);
-
-        return loadCars;
-    }
-
-    public static void acceptInput(ArrayList<Car> cars) {
+    public static void acceptInput(ArrayList<Car> cars, String fileName) {
         boolean isUserFinished = false;
 
         Scanner scan = new Scanner(System.in);
@@ -92,10 +85,10 @@ public class ArrayListObjectDemo {
                 case "6":
                     break;
                 case "7":
-                    deserialize(cars, "result.bin");
+                    deserialize(cars, fileName);
                     break;
                 case "8":
-                    serialize(cars, "result.bin");
+                    serialize(cars, fileName);
                     break;
                 default:
                     break;
@@ -228,6 +221,7 @@ public class ArrayListObjectDemo {
     }
 
     public static void deserialize(ArrayList<Car> cars, String filename) {
+        cars.clear();
         Vector v = new Vector();
         try {
             FileInputStream fileIn = new FileInputStream(filename);
@@ -244,16 +238,16 @@ public class ArrayListObjectDemo {
             }
             System.out.println(v.size() + " car" + pluralText + " imported");
             
-            
         } catch (IOException err) { // handle IO exception
             System.err.println(err);
         } catch (ClassNotFoundException err) { // handle ClassNotFound exception
             System.err.println(err);
         }
 
-//        for (int i = 0; i < v.size(); i++) {
-//            Car temp = (Car) v.elementAt(i);
-//            temp.display();
-//        }
+        for (int i = 0; i < v.size(); i++) {
+            Car temp = (Car) v.elementAt(i);
+            cars.add(temp);
+            //temp.display();
+        }
     }
 }
