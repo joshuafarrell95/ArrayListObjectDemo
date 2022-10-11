@@ -27,6 +27,8 @@ public class ArrayListObjectDemo {
     public static void main(String[] args) {
         //ArrayList<Car> cars = new ArrayList<>();
         String fileName;
+        Scanner scan = new Scanner(System.in);
+        scan.useDelimiter("\n"); /* Use the ENTER key as a delimiter*/
         
         if (checkFile(args)) {
             fileName = args[1];
@@ -35,11 +37,17 @@ public class ArrayListObjectDemo {
         }
         
         ArrayList<Car> cars = new ArrayList<>();
-        deserialize(cars, fileName);
         
-        acceptInput(cars, fileName); /* run driver code */
+        acceptInput(cars, scan, fileName); /* run driver code */
     }
 
+    /**
+     * This will check args if there is a fileName
+     * 
+     * @param args The command line arguments from main()
+     * @return if there is no file name in args, return false
+     * else return true
+     */
     public static boolean checkFile(String[] args) {
         /* Checks if args[1] has a filename */
         if (args.length < 1) {
@@ -49,12 +57,21 @@ public class ArrayListObjectDemo {
         return true;
     }
 
-    public static void acceptInput(ArrayList<Car> cars, String fileName) {
+    /**
+     * This is the driver code that runs the menu system and calls
+     * various methods.
+     * 
+     * @param cars The ArrayList<Car> object that is used throughout the program
+     * @param scan The Scanner object to enable user input
+     * @param fileName The file name which comes from args[1] or a default file name
+     */
+    public static void acceptInput(ArrayList<Car> cars, Scanner scan, String fileName) {
         boolean isUserFinished = false;
 
-        Scanner scan = new Scanner(System.in);
         String userInput = "";
-
+        
+        deserialize(cars, fileName);
+        
         while (!isUserFinished) {
             printMenu();
             try {
@@ -65,8 +82,7 @@ public class ArrayListObjectDemo {
             }
 
             switch (userInput) {
-                case "0":
-                    /* Exit program */
+                case "0": /* Exit program */
                     isUserFinished = true;
                     break;
                 case "1":
@@ -79,15 +95,17 @@ public class ArrayListObjectDemo {
                     sortList(cars);
                     break;
                 case "4":
+                    searchCar(cars, scan);
                     break;
                 case "5":
+                    editCar(cars, scan);
                     break;
                 case "6":
                     break;
-                case "7":
+                case "7": /* Load .bin file */
                     deserialize(cars, fileName);
                     break;
-                case "8":
+                case "8": /* Save .bin file */
                     serialize(cars, fileName);
                     break;
                 default:
@@ -96,6 +114,9 @@ public class ArrayListObjectDemo {
         }
     }
 
+    /** 
+     * This is used to print a menu interface
+     */
     public static void printMenu() {
         System.out.println("Array List Object Demo");
         System.out.println("======================");
@@ -103,8 +124,8 @@ public class ArrayListObjectDemo {
         System.out.println("1 - Add new car");
         System.out.println("2 - Display list of cars");
         System.out.println("3 - Sort list of cars");
-        System.out.println("4 - Search for a car - UNIMPLEMENTED");
-        System.out.println("5 - Edit a car - UNIMPLEMENTED");
+        System.out.println("4 - Search for a car");
+        System.out.println("5 - Edit a car - PARTIALLY IMPLEMENTED");
         System.out.println("6 - Delete a car - UNIMPLEMENTED");
         System.out.println("7 - Load list of cars");
         System.out.println("8 - Save list of cars");
@@ -112,6 +133,12 @@ public class ArrayListObjectDemo {
         System.out.print("Enter a menu option here: ");
     }
 
+    /**
+     * This is used to add a new car to the passed in ArrayList<Car>
+     * @param cars The ArrayList<Car> to add a Car class object to
+     * @param scan The Scanner object to enable user input
+     * @throws InputMismatchException
+     */
     public static void addNewCar(ArrayList<Car> cars, Scanner scan) {
         boolean isListFinished = false;
         try {
@@ -122,7 +149,6 @@ public class ArrayListObjectDemo {
                 String newModel;
                 String newYear;
                 
-                scan.useDelimiter("\n"); /* Use the ENTER key as a delimiter*/
                 int newOdometer = 0;
                 
                 System.out.print("Enter a car make: ");
@@ -145,7 +171,7 @@ public class ArrayListObjectDemo {
 
                 cars.add(newCar);
 
-                isListFinished = askForAnotherCar(scan);
+                isListFinished = askForAnotherCar(scan, "Do you want to add a new car?");
             }
         } catch (InputMismatchException ex) {
             //System.out.println(ex.toString());
@@ -153,8 +179,14 @@ public class ArrayListObjectDemo {
         }
     }
 
-    public static boolean askForAnotherCar(Scanner scan) {
-        System.out.print("Do you want to add a new car? [Y] or [N]: ");
+    /** 
+     * This will ask the user for another car
+     * @param scan The Scanner object to enable user input
+     * @param message The message to output to the user
+     * @return !b
+     */
+    public static boolean askForAnotherCar(Scanner scan, String message) {
+        System.out.print(message + " [Y] or [N]: ");
 
         Pattern p = Pattern.compile("[Y[y]]");
         Matcher m = p.matcher(scan.next());
@@ -164,11 +196,21 @@ public class ArrayListObjectDemo {
         /* The inverse of b must be returned to allow another car to be added */
     }
 
+    /**
+     * This is used to display a list of Car objects held within an ArrayList<Car>
+     * @param cars The ArrayList<Car> to read Car class object from
+     */
     public static void displayList(ArrayList<Car> cars) {
         /* This allows displayList() to be called independently with sortList() */
         displayList(cars, false);
     }
-
+    
+    /**
+     * This is used to display a list of Car objects held within an ArrayList<Car>
+     * and can also be used to sort the ArrayList<Car>
+     * @param cars The ArrayList<Car> to read Car class object from
+     * @param isListToBeSorted true to sort the ArrayList<Car>
+     */
     public static void displayList(ArrayList<Car> cars, boolean isListToBeSorted) {
         if (isListToBeSorted) {
             sortList(cars);
@@ -178,15 +220,80 @@ public class ArrayListObjectDemo {
         for (Car c : cars) {
             c.display();
         }
+        System.out.println();
     }
 
     public static void sortList(ArrayList<Car> cars) {
         Collections.sort(cars);
     }
 
-    public static void searchCar(ArrayList<Car> cars, String searchString) {
+    public static void searchCar(ArrayList<Car> cars, Scanner scan) {
+        String searchString;
+        
+        System.out.println("\nPlease enter a car's make here: ");
+        searchString = scan.next();
+        
         int indx = cars.indexOf(searchString);
+        
+        //int indx = Collections.binarySearch(cars, searchString);
+        
+        if (indx >= 0) {
+            System.out.println("Car " + searchString + " found at index " + indx);
+        } else {
+            System.out.println("No car " + searchString + " found");
+        }
         //int result = Collections.binarySearch(cars, indx);
+    }
+    
+    public static void editCar(ArrayList<Car> cars, Scanner scan) {
+        System.out.print("Enter the make of a car to edit: ");
+        String searchString = scan.next();
+               
+        String tempMake;
+        String tempModel;
+        String tempYear;
+        int tempOdometer;
+        
+        for (Car car : cars) {
+            tempMake = car.getMake();
+            tempModel = car.getModel();
+            tempYear = car.getYear();
+            tempOdometer = car.getOdometer();
+            if (tempMake.equals(searchString)) {
+                
+                
+                System.out.println("Are you sure you want to edit this car?\r\n");
+                car.display();
+                boolean isCarEditable = askForAnotherCar(scan, "");
+
+                if (isCarEditable) {
+                    try {
+                        System.out.print("Enter a car make: ");
+                        //scan.hasNext();
+                        tempMake = scan.next();
+
+//                        /* Get the model */
+//                        System.out.print("Enter a car model: ");
+//                        tempModel = scan.next();
+//
+//                        /* Get the year */
+//                        System.out.print("Enter a car year: ");
+//                        tempYear = scan.next();
+//
+//                        /* Get the odometer */
+//                        System.out.print("Enter a car odometer: ");
+//                        tempOdometer = scan.nextInt();
+                        
+                        /* Only commit the changes if there are no exceptions */
+//                        car.setMake(tempMake);
+                    } catch (InputMismatchException ex) {
+                        
+                    }
+                    
+                    
+                }
+            }
+        }
     }
 
     public static void deleteCar(ArrayList<Car> cars, String deleteString, Scanner scan) {

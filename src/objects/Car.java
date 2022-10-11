@@ -21,7 +21,7 @@ public class Car implements Comparable<Car>, Serializable {
      */
     @Deprecated
     public Car() {
-        System.out.println("You must enter a car's make, model, year and odometer");
+        //System.out.println("You must enter a car's make, model, year and odometer");
     }
 
     /**
@@ -80,7 +80,11 @@ public class Car implements Comparable<Car>, Serializable {
             System.out.print(" ");
         }
     }
-
+    
+//    public void setMake(String make) {
+//        this.make = make;
+//    }
+    
     /**
      *
      * @return
