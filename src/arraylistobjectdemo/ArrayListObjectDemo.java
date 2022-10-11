@@ -83,9 +83,7 @@ public class ArrayListObjectDemo {
 
             switch (userInput) {
                 case "0": /* Exit program */
-                    System.out.print("Are you sure you want to exit the program? ");
-                    
-                    isUserFinished = true;
+                    isUserFinished = askUserForConfirmation(scan, "Are you sure you want to exit the program? ");
                     break;
                 case "1":
                     addNewCar(cars, scan);
