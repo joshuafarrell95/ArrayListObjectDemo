@@ -61,7 +61,7 @@ public class ArrayListObjectDemo {
      * This is the driver code that runs the menu system and calls
      * various methods.
      * 
-     * @param cars The ArrayList<Car> object that is used throughout the program
+     * @param cars The ArrayList{@literal<Car>} object that is used throughout the program
      * @param scan The Scanner object to enable user input
      * @param fileName The file name which comes from args[1] or a default file name
      */
@@ -83,6 +83,8 @@ public class ArrayListObjectDemo {
 
             switch (userInput) {
                 case "0": /* Exit program */
+                    System.out.print("Are you sure you want to exit the program? ");
+                    
                     isUserFinished = true;
                     break;
                 case "1":
@@ -124,7 +126,7 @@ public class ArrayListObjectDemo {
         System.out.println("1 - Add new car");
         System.out.println("2 - Display list of cars");
         System.out.println("3 - Sort list of cars");
-        System.out.println("4 - Search for a car");
+        System.out.println("4 - Search for a car - UNIMPLEMENTED");
         System.out.println("5 - Edit a car - PARTIALLY IMPLEMENTED");
         System.out.println("6 - Delete a car - UNIMPLEMENTED");
         System.out.println("7 - Load list of cars");
@@ -134,8 +136,8 @@ public class ArrayListObjectDemo {
     }
 
     /**
-     * This is used to add a new car to the passed in ArrayList<Car>
-     * @param cars The ArrayList<Car> to add a Car class object to
+     * This is used to add a new car to the passed in ArrayList{@literal<Car>}
+     * @param cars The ArrayList{@literal<Car>} to add a Car class object to
      * @param scan The Scanner object to enable user input
      * @throws InputMismatchException
      */
@@ -171,7 +173,7 @@ public class ArrayListObjectDemo {
 
                 cars.add(newCar);
 
-                isListFinished = askForAnotherCar(scan, "Do you want to add a new car?");
+                isListFinished = askUserForConfirmation(scan, "Do you want to add a new car?", true);
             }
         } catch (InputMismatchException ex) {
             //System.out.println(ex.toString());
@@ -183,22 +185,38 @@ public class ArrayListObjectDemo {
      * This will ask the user for another car
      * @param scan The Scanner object to enable user input
      * @param message The message to output to the user
-     * @return !b
+     * @return true for [Y] and false for [N]
      */
-    public static boolean askForAnotherCar(Scanner scan, String message) {
+    public static boolean askUserForConfirmation(Scanner scan, String message) {
+        return askUserForConfirmation(scan, message, false);
+        /* The inverse of b must be returned to allow another car to be added */
+    }
+    
+    /** 
+     * This will ask the user for another car
+     * @param scan The Scanner object to enable user input
+     * @param message The message to output to the user
+     * @param isLogicInverted True to invert output, False to retain standard output
+     * @return if isLogicInverted = true, false for [Y] and true for [N]
+     * else, true for [Y] and false for [N]
+     */
+    public static boolean askUserForConfirmation(Scanner scan, String message, boolean isLogicInverted) {
         System.out.print(message + " [Y] or [N]: ");
 
         Pattern p = Pattern.compile("[Y[y]]");
         Matcher m = p.matcher(scan.next());
         boolean b = m.matches();
 
-        return !b;
-        /* The inverse of b must be returned to allow another car to be added */
+        if (isLogicInverted) {
+            return !b;
+        } else {
+            return b;
+        }
     }
 
     /**
-     * This is used to display a list of Car objects held within an ArrayList<Car>
-     * @param cars The ArrayList<Car> to read Car class object from
+     * This is used to display a list of Car objects held within an ArrayList{@literal<Car>}
+     * @param cars The ArrayList{@literal<Car>} to read Car class object from
      */
     public static void displayList(ArrayList<Car> cars) {
         /* This allows displayList() to be called independently with sortList() */
@@ -206,10 +224,11 @@ public class ArrayListObjectDemo {
     }
     
     /**
-     * This is used to display a list of Car objects held within an ArrayList<Car>
-     * and can also be used to sort the ArrayList<Car>
-     * @param cars The ArrayList<Car> to read Car class object from
-     * @param isListToBeSorted true to sort the ArrayList<Car>
+     * This is used to display a list of Car objects held within an ArrayList{@literal<Car>}
+     * and can also be used to sort the ArrayList{@literal<Car>}
+     * @param cars The ArrayList{@literal<Car>} to read Car class object from
+     * @param isListToBeSorted true to sort the ArrayList{@literal<Car>}
+     * else false to leave the ArrayList{@literal<Car>} unsorted
      */
     public static void displayList(ArrayList<Car> cars, boolean isListToBeSorted) {
         if (isListToBeSorted) {
@@ -264,11 +283,11 @@ public class ArrayListObjectDemo {
                 
                 System.out.println("Are you sure you want to edit this car?\r\n");
                 car.display();
-                boolean isCarEditable = askForAnotherCar(scan, "");
+                boolean isCarEditable = askUserForConfirmation(scan, "");
 
                 if (isCarEditable) {
                     try {
-                        System.out.print("Enter a car make: ");
+                        System.out.print("Enter a car make [or press ENTER to leave as is]: ");
                         //scan.hasNext();
                         tempMake = scan.next();
 
@@ -285,12 +304,17 @@ public class ArrayListObjectDemo {
 //                        tempOdometer = scan.nextInt();
                         
                         /* Only commit the changes if there are no exceptions */
-//                        car.setMake(tempMake);
+                        /* and the user hasn't pressed the ENTER key          */
+                        if (!(tempMake.contains("")))
+                        {
+                            car.setMake(tempMake);
+                        }
+//                      car.setModel(tempModel);
+//                      car.setYear(tempYear);
+//                      car.setOdometer(tempOdometer);
                     } catch (InputMismatchException ex) {
                         
                     }
-                    
-                    
                 }
             }
         }

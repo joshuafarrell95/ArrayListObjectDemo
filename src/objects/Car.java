@@ -81,9 +81,9 @@ public class Car implements Comparable<Car>, Serializable {
         }
     }
     
-//    public void setMake(String make) {
-//        this.make = make;
-//    }
+    public void setMake(String make) {
+        this.make = make;
+    }
     
     /**
      *
@@ -91,6 +91,10 @@ public class Car implements Comparable<Car>, Serializable {
      */
     public String getMake() {
         return make;
+    }
+    
+    public void setModel(String model) {
+        this.model = model;
     }
     
     /**
@@ -101,12 +105,20 @@ public class Car implements Comparable<Car>, Serializable {
         return model;
     }
     
+    public void setYear(String year) {
+        this.year = year;
+    }
+    
     /**
      *
      * @return
      */
     public String getYear() {
         return year;
+    }
+    
+    public void setMake(int odometer) {
+        this.odometer = odometer;
     }
     
     /**
